@@ -15,4 +15,13 @@ public class LoanUseCase {
     return repository.getReport(REPORT_STATUS);
   }
 
+  public Mono<Loan> saveLoanReport(Loan loan) {
+    return repository.getReport(REPORT_STATUS).flatMap(currentReport -> {
+      loan.setStatus(REPORT_STATUS);
+      loan.setCount(currentReport.getCount() + loan.getCount());
+      loan.setTotal(currentReport.getTotal() + loan.getTotal());
+      return Mono.just(loan);
+    }).flatMap(repository::saveReport);
+  }
+
 }

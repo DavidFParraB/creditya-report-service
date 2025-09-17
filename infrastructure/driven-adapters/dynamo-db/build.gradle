@@ -4,4 +4,10 @@ dependencies {
     implementation 'software.amazon.awssdk:dynamodb-enhanced'
     implementation 'org.reactivecommons.utils:object-mapper-api:0.1.0'
     testImplementation 'org.reactivecommons.utils:object-mapper:0.1.0'
+
+    compileOnly 'org.projectlombok:lombok:1.18.30'
+    annotationProcessor 'org.projectlombok:lombok:1.18.30'
+
+    implementation 'org.apache.logging.log4j:log4j-api:2.23.1'
+    implementation 'org.apache.logging.log4j:log4j-core:2.23.1'
 }

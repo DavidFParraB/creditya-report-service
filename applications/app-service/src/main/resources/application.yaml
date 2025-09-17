@@ -11,7 +11,7 @@ spring:
       path: "/h2"
   profiles:
     include: null
-    active: local
+    active: "local"
 aws:
   region: "us-east-2"
   dynamodb:
@@ -27,3 +27,12 @@ management:
         enabled: true
 cors:
   allowed-origins: "http://localhost:4200,http://localhost:8080"
+entrypoint:
+  sqs:
+    region: "us-east-2"
+    endpoint: "https://sqs.us-east-2.amazonaws.com"
+    queueUrl: "https://sqs.us-east-2.amazonaws.com/817100478616/SQSLoanReport"
+    waitTimeSeconds: 20
+    maxNumberOfMessages: 10
+    visibilityTimeoutSeconds: 10
+    numberOfThreads: 1

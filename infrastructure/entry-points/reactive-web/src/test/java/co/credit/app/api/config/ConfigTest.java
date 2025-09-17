@@ -20,7 +20,7 @@ class ConfigTest {
     @Test
     void corsConfigurationShouldAllowOrigins() {
         webTestClient.get()
-                .uri("/api/usecase/path")
+                .uri("/api/report")
                 .exchange()
                 .expectStatus().isOk()
                 .expectHeader().valueEquals("Content-Security-Policy",
