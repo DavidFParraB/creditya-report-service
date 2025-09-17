@@ -1,0 +1,16 @@
+server:
+  port: 8080
+spring:
+  application:
+    name: "credit-application"
+  devtools:
+    add-properties: false
+  h2:
+    console:
+      enabled: true
+      path: "/h2"
+  profiles:
+    include: null
+aws:
+  dynamodb:
+    endpoint: "arn:aws:dynamodb:us-east-2:817100478616:table/loan_report"
