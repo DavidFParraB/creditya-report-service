@@ -2,6 +2,7 @@ package co.credit.app.dynamodb.helper;
 
 import co.credit.app.dynamodb.DynamoDBTemplateAdapter;
 import co.credit.app.dynamodb.ModelEntity;
+import co.credit.app.model.loan.Loan;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -31,6 +32,7 @@ class TemplateAdapterOperationsTest {
     private DynamoDbAsyncTable<ModelEntity> customerTable;
 
     private ModelEntity modelEntity;
+    private Loan loan;
 
     @BeforeEach
     void setUp() {
@@ -42,6 +44,9 @@ class TemplateAdapterOperationsTest {
         modelEntity = new ModelEntity();
         modelEntity.setStatus("approved");
         modelEntity.setCount(0.0);
+        modelEntity.setTotal(0.0);
+
+        loan = new Loan("approved", 0.0, 0.0);
     }
 
     @Test
@@ -56,11 +61,12 @@ class TemplateAdapterOperationsTest {
     void testSave() {
         when(customerTable.putItem(modelEntity)).thenReturn(CompletableFuture.runAsync(()->{}));
         when(mapper.map(modelEntity, ModelEntity.class)).thenReturn(modelEntity);
+        when(mapper.map(loan, ModelEntity.class)).thenReturn(modelEntity);
 
         DynamoDBTemplateAdapter dynamoDBTemplateAdapter =
                 new DynamoDBTemplateAdapter(dynamoDbEnhancedAsyncClient, mapper);
 
-        StepVerifier.create(dynamoDBTemplateAdapter.save(modelEntity))
+        StepVerifier.create(dynamoDBTemplateAdapter.save(loan))
                 .expectNextCount(1)
                 .verifyComplete();
     }
@@ -72,20 +78,20 @@ class TemplateAdapterOperationsTest {
         when(customerTable.getItem(
                 Key.builder().partitionValue(AttributeValue.builder().s(id).build()).build()))
                 .thenReturn(CompletableFuture.completedFuture(modelEntity));
-        when(mapper.map(modelEntity, Object.class)).thenReturn("value");
+        when(mapper.map(modelEntity, Loan.class)).thenReturn(loan);
 
         DynamoDBTemplateAdapter dynamoDBTemplateAdapter =
                 new DynamoDBTemplateAdapter(dynamoDbEnhancedAsyncClient, mapper);
 
         StepVerifier.create(dynamoDBTemplateAdapter.getById("approved"))
-                .expectNext("value")
+                .expectNext(loan)
                 .verifyComplete();
     }
 
     @Test
     void testDelete() {
-        when(mapper.map(modelEntity, ModelEntity.class)).thenReturn(modelEntity);
-        when(mapper.map(modelEntity, Object.class)).thenReturn("value");
+        when(mapper.map(loan, ModelEntity.class)).thenReturn(modelEntity);
+        when(mapper.map(modelEntity, Loan.class)).thenReturn(loan);
 
         when(customerTable.deleteItem(modelEntity))
                 .thenReturn(CompletableFuture.completedFuture(modelEntity));
@@ -93,8 +99,8 @@ class TemplateAdapterOperationsTest {
         DynamoDBTemplateAdapter dynamoDBTemplateAdapter =
                 new DynamoDBTemplateAdapter(dynamoDbEnhancedAsyncClient, mapper);
 
-        StepVerifier.create(dynamoDBTemplateAdapter.delete(modelEntity))
-                .expectNext("value")
+        StepVerifier.create(dynamoDBTemplateAdapter.delete(loan))
+                .expectNext(loan)
                 .verifyComplete();
     }
 }

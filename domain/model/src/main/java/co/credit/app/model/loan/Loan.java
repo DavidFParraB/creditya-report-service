@@ -12,6 +12,6 @@ import lombok.Setter;
 @Builder(toBuilder = true)
 public class Loan {
   private String status;
-  private Long total;
-  private Double amount;
+  private Double total;
+  private Double count;
 }

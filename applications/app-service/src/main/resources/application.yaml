@@ -11,6 +11,19 @@ spring:
       path: "/h2"
   profiles:
     include: null
+    active: local
 aws:
+  region: "us-east-2"
   dynamodb:
-    endpoint: "arn:aws:dynamodb:us-east-2:817100478616:table/loan_report"
+    endpoint: "https://dynamodb.us-east-2.amazonaws.com"
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health,prometheus"
+  endpoint:
+    health:
+      probes:
+        enabled: true
+cors:
+  allowed-origins: "http://localhost:4200,http://localhost:8080"

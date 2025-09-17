@@ -8,10 +8,11 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class LoanUseCase {
 
+  private static final String REPORT_STATUS = "approved";
   private final LoanRepository repository;
 
   public Mono<Loan> getLoanReport() {
-    return repository.getReport();
+    return repository.getReport(REPORT_STATUS);
   }
 
 }
