@@ -3,6 +3,7 @@ package co.credit.app.sqs.listener;
 
 import co.credit.app.model.loan.Loan;
 import co.credit.app.sqs.listener.dto.LoanDTO;
+import co.credit.app.sqs.listener.dto.SnsDTO;
 import co.credit.app.usecase.loan.LoanUseCase;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -24,16 +25,27 @@ public class SQSProcessor implements Function<Message, Mono<Void>> {
   @Override
   public Mono<Void> apply(Message message) {
     log.info("Processing message: {}", message.body());
-    return Mono.fromCallable(() -> objectMapper.readValue(message.body(), LoanDTO.class))
+    return Mono.fromCallable(() -> objectMapper.readValue(message.body(), SnsDTO.class))
+        .flatMap(snsDTO -> {
+          log.info("Message from snsDTO: {}", snsDTO.getMessage());
+          return Mono.fromCallable(
+              () -> objectMapper.readValue(snsDTO.getMessage(), LoanDTO.class));
+        })
+        .onErrorResume(e -> {
+          log.error("Failed to parse message", e);
+          return Mono.error(new IllegalArgumentException("Invalid SNS or loan message.", e));
+        })
+        .filter(loanReceiverDTO -> loanReceiverDTO.getStatus().equalsIgnoreCase("APPROVED"))
         .map(loanReceiverDTO -> Loan.builder()
-            .status(loanReceiverDTO.getStatus() == null ? "pending" : loanReceiverDTO.getStatus())
+            .status(loanReceiverDTO.getStatus().toLowerCase())
             .count(1.0)
             .total(loanReceiverDTO.getAmount())
             .build())
         .flatMap(loanUseCase::saveLoanReport)
         .onErrorResume(e -> {
-            log.error("Failed to process message", e);
-            return Mono.error(new IllegalArgumentException("Invalid loan or status.", e));
-        }).then();
+          log.error("Failed to process message", e);
+          return Mono.error(new IllegalArgumentException("Invalid loan or status.", e));
+        })
+        .then();
   }
 }
