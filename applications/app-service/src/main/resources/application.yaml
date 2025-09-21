@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 8081
 spring:
   application:
     name: "credit-application"
@@ -11,7 +11,7 @@ spring:
       path: "/h2"
   profiles:
     include: null
-    active: "local"
+    active: "dev"
 aws:
   region: "us-east-2"
   dynamodb:
